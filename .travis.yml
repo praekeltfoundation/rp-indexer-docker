@@ -1,0 +1,44 @@
+sudo: required
+language: python
+services:
+  - docker
+
+group: trusty_latest
+
+env:
+  global:
+    - REGISTRY_USER=rapidproautomation
+    - IMAGE="praekeltfoundation/rp-indexer" VERSION="" REPO="nyaruka/rp-indexer"
+    - secure: "IqP3anozETLOEK6fOILXDgrKLo8LJv70d9gSyl5InOYlEB+JD1zLj9ORXwCsUEM6MQcQ7oiBufUm1EhN76lcpOR8d3xn1tuIwNVDumd5d/vfo7raZ4roDg21V3XPzUCrJrA52eHmbv80kt0uh121GDZPAdkeI+IrNlq0XVYlSpGec0umzzGp+MdQ7w9hK9hFNQCqYSctg+QBH44wF7qdEjeThayNkHtKC9i5z/aycmt7NzuDz4MOXqcUwHDDtKvU0Y0Jgb69carZ+iLTTrKn0wE6p4k4l7QzZ5RSikCN7n54KRZkGRrQRs+rnUo8K8iKwTObBfLUq305iCvnYJ4SORQqaFxtbDlkWQpPF8t/Z2A5zwjpfzBjzP8xSFoNm8uh1+iFWycw9ol6SnmooHloMd19gj2zjkNo4rNH72FFikpoSx6X9tbSEdN/X5QQOcZj1/OmkcNLzNgxZI2hUnga4Q0xMF+XGIzDTEs0pl69nDFSa62PbYPbpg0Ix2po/0pjOakYRH+91QVrE+VpUXI3BcQQ9lJU5AA8y+Amn5MZH4+1424FUmwpfAQe5/z4Fy/eVMnYzXlUikwu2G3+cQGSRaNyMbAzvwm9yT1IqnSslWWp/xhtDafr7F5oeFFlpJ2OdiS1Zvv+dxl4luZAPj3LV2G9/yv83Ri511NlF2OeGQY="
+
+before_script:
+  - LATEST_TAG=$(curl -s https://api.github.com/repos/$REPO/tags  | jq -r '.[0].name')
+  - LATEST_TAG="${LATEST_TAG//[v]}"
+  - VERSION=${VERSION:-$LATEST_TAG}
+
+install: []
+
+script:
+  - wget -O rp-indexer.tar.gz "https://github.com/$REPO/releases/download/v${VERSION}/rp-indexer_${VERSION}_linux_amd64.tar.gz"
+  - mkdir rp-indexer
+  - tar -xzC rp-indexer -f rp-indexer.tar.gz
+  - docker pull "$IMAGE" || true
+  - >
+    docker build --pull --cache-from "$IMAGE" \
+      --tag "$IMAGE" \
+      .
+  - rm -rf rp-indexer rp-indexer.tar.gz;
+
+after_script:
+  - docker images
+
+before_deploy:
+  - pip install docker-ci-deploy==0.3.0
+  - echo -n $REGISTRY_PASS | docker login -u "$REGISTRY_USER" --password-stdin
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: dcd --tag-version "$VERSION" --tag-semver --tag-latest "$IMAGE"
+  on:
+    branch: master
