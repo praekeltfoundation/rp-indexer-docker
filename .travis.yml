@@ -19,15 +19,13 @@ before_script:
 install: []
 
 script:
-  - wget -O rp-indexer.tar.gz "https://github.com/$REPO/releases/download/v${VERSION}/rp-indexer_${VERSION}_linux_amd64.tar.gz"
-  - mkdir rp-indexer
-  - tar -xzC rp-indexer -f rp-indexer.tar.gz
   - docker pull "$IMAGE" || true
   - >
     docker build --pull --cache-from "$IMAGE" \
       --tag "$IMAGE" \
+      --build-arg RP_INDEXER_VERSION=$VERSION \
+      --build-arg RP_INDEXER_REPO=$REPO \
       .
-  - rm -rf rp-indexer rp-indexer.tar.gz;
 
 after_script:
   - docker images
