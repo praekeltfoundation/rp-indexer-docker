@@ -34,4 +34,4 @@ EXPOSE 8080
 USER rp_indexer
 
 ENTRYPOINT []
-CMD ["rp_indexer"]
+CMD ["rp-indexer"]
