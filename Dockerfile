@@ -10,7 +10,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 ARG RP_INDEXER_REPO
-ENV RP_INDEXER_REPO=${RP_INDEXER_REPO:-nyaruka/rp-indexer
+ENV RP_INDEXER_REPO=${RP_INDEXER_REPO:-nyaruka/rp-indexer}
 ARG RP_INDEXER_VERSION
 ENV RP_INDEXER_VERSION=${RP_INDEXER_VERSION:-1.0.23}
 
