@@ -12,6 +12,7 @@ jobs:
     env:
       INDEXER_REPO: nyaruka/rp-indexer
       GREP_TIMEOUT: 60
+      PGPASSWORD: temba
     strategy:
       matrix:
         INDEXER_VERSION: ["7.0.0"]
