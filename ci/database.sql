@@ -15,3 +15,18 @@ CREATE TABLE public.contacts_contact (
     ticket_count integer NOT NULL,
     current_flow_id integer
 );
+
+CREATE TABLE public.contacts_contacturn (
+    id integer NOT NULL,
+    identity character varying(255) NOT NULL,
+    scheme character varying(128) NOT NULL,
+    path character varying(255) NOT NULL,
+    display character varying(255),
+    priority integer NOT NULL,
+    auth text,
+    channel_id integer,
+    contact_id integer,
+    org_id integer NOT NULL,
+    CONSTRAINT identity_matches_scheme_and_path CHECK (((identity)::text = concat(scheme, concat(':', path)))),
+    CONSTRAINT non_empty_scheme_and_path CHECK ((NOT (((scheme)::text = ''::text) OR ((path)::text = ''::text))))
+);
