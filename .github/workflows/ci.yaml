@@ -1,0 +1,82 @@
+name: Docker image build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      INDEXER_REPO: nyaruka/rp-indexer
+      GREP_TIMEOUT: 60
+    strategy:
+      matrix:
+        INDEXER_VERSION: ["7.0.0"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: Run ElasticSearch
+        run: docker run --name elasticsearch -d -p 9200:9200 -e 'discovery.type=single-node' elasticsearch:7.10.1
+      - name: Install PostgreSQL
+        uses: nyaruka/postgis-action@v2
+        with:
+          postgresql version: "13"
+          postgis version: "3.1"
+          postgresql db: temba
+          postgresql user: temba
+          postgresql password: temba
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          context: .
+          tags: indexer
+          build-args: |
+            INDEXER_REPO=${{env.INDEXER_REPO}}
+            INDEXER_VERSION=${{matrix.INDEXER_VERSION}}
+      - name: Test image
+        run: |
+          docker run --name indexer --env-file docker.envfile --link postgis --link redis --publish 8080:8080 --detach indexer
+          timeout ${{env.GREP_TIMEOUT}} grep -m 1 'server listening on 8080' <(docker logs --follow indexer 2>&1)
+          curl http://localhost:8080/ | grep -m 1 ${{matrix.INDEXER_VERSION}}
+      - name: debug outputs
+        if: always()
+        run: |
+          docker ps
+          docker images
+          docker logs indexer
+      - name: Create image tags
+        uses: docker/metadata-action@v3
+        id: tags
+        with:
+          images: |
+            praekeltfoundation/rp-indexer
+            ghcr.io/praekeltfoundation/rp-indexer-docker
+          tags: |
+            type=pep440,pattern=v{{major}},value=${{matrix.INDEXER_VERSION}}
+            type=pep440,pattern=v{{major}}.{{minor}},value=${{matrix.INDEXER_VERSION}}
+            type=pep440,pattern=v{{version}},value=${{matrix.INDEXER_VERSION}}
+      - name: login to ghcr
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: login to docker hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{github.event_name != 'pull_request'}}
+          tags: ${{steps.tags.outputs.tags}}
+          context: .
+          build-args: |
+            INDEXER_REPO=${{env.INDEXER_REPO}}
+            INDEXER_VERSION=${{matrix.INDEXER_VERSION}} 

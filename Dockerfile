@@ -1,37 +1,28 @@
-FROM debian:stretch-slim
-
-RUN set -ex; \
-    addgroup --system rp_indexer; \
-    adduser --system --ingroup rp_indexer rp_indexer
-
-# Install ca-certificates so HTTPS works in general
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends ca-certificates && \
-  rm -rf /var/lib/apt/lists/*
+FROM debian:bullseye-slim as build
 
 ARG RP_INDEXER_REPO
-ENV RP_INDEXER_REPO=${RP_INDEXER_REPO:-nyaruka/rp-indexer}
 ARG RP_INDEXER_VERSION
-ENV RP_INDEXER_VERSION=${RP_INDEXER_VERSION:-1.0.23}
+
+RUN apt update && apt install -y wget
+RUN wget -q -O indexer.tar.gz "https://github.com/$RP_INDEXER_REPO/releases/download/v${RP_INDEXER_VERSION}/rp-indexer_${RP_INDEXER_VERSION}_linux_amd64.tar.gz"
+RUN mkdir indexer
+RUN tar -xzC indexer -f indexer.tar.gz
+
+
+FROM debian:bullseye-slim
 
 RUN set -ex; \
-  apt-get update; \
-  apt-get install -y --no-install-recommends wget; \
-  rm -rf /var/lib/apt/lists/*; \
-  \
-  wget -O rp-indexer.tar.gz "https://github.com/$RP_INDEXER_REPO/releases/download/v${RP_INDEXER_VERSION}/rp-indexer_${RP_INDEXER_VERSION}_linux_amd64.tar.gz"; \
-  mkdir /usr/local/src/rp-indexer; \
-  tar -xzC /usr/local/src/rp-indexer -f rp-indexer.tar.gz; \
-  \
-# Just grab the binary and ignore the other packaged files
-  mv /usr/local/src/rp-indexer/rp-indexer /usr/local/bin/; \
-  rm -rf /usr/local/src/rp-indexer rp-indexer.tar.gz; \
-  \
-  apt-get purge -y --auto-remove wget
+    addgroup --system indexer; \
+    adduser --system --ingroup indexer indexer
 
-EXPOSE 8080
+# Install ca-certificates so HTTPS works in general
+RUN apt update && \
+  apt install -y --no-install-recommends ca-certificates && \
+  rm -rf /var/lib/apt/lists/*
 
-USER rp_indexer
+COPY --from=build indexer/rp-indexer /usr/local/bin
+
+USER indexer
 
 ENTRYPOINT []
 CMD ["rp-indexer"]
