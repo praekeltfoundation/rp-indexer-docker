@@ -1,2 +1,2 @@
 INDEXER_DB=postgres://temba:temba@postgis/temba?sslmode=disable
-INDEXER_ELASTIC_URL=http://elasticsearch
+INDEXER_ELASTIC_URL=http://elasticsearch:9200
