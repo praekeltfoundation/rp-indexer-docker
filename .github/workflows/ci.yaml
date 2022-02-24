@@ -38,6 +38,9 @@ jobs:
           build-args: |
             INDEXER_REPO=${{env.INDEXER_REPO}}
             INDEXER_VERSION=${{matrix.INDEXER_VERSION}}
+      - name: Create postgresql tables
+        run: |
+          psql -h localhost -d temba -U temba -f ci/database.sql
       - name: Test image
         # First run there are errors while it creates the indexes, so we only check for errors on second run
         run: |
