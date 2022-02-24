@@ -30,3 +30,9 @@ CREATE TABLE public.contacts_contacturn (
     CONSTRAINT identity_matches_scheme_and_path CHECK (((identity)::text = concat(scheme, concat(':', path)))),
     CONSTRAINT non_empty_scheme_and_path CHECK ((NOT (((scheme)::text = ''::text) OR ((path)::text = ''::text))))
 );
+
+CREATE TABLE public.contacts_contactgroup_contacts (
+    id bigint NOT NULL,
+    contactgroup_id integer NOT NULL,
+    contact_id integer NOT NULL
+);
