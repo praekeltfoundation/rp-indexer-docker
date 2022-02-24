@@ -1,10 +1,10 @@
 FROM debian:bullseye-slim as build
 
-ARG RP_INDEXER_REPO
-ARG RP_INDEXER_VERSION
+ARG INDEXER_REPO
+ARG INDEXER_VERSION
 
 RUN apt update && apt install -y wget
-RUN wget -q -O indexer.tar.gz "https://github.com/$RP_INDEXER_REPO/releases/download/v${RP_INDEXER_VERSION}/rp-indexer_${RP_INDEXER_VERSION}_linux_amd64.tar.gz"
+RUN wget -q -O indexer.tar.gz "https://github.com/$INDEXER_REPO/releases/download/v${INDEXER_VERSION}/rp-indexer_${RP_INDEXER_VERSION}_linux_amd64.tar.gz"
 RUN mkdir indexer
 RUN tar -xzC indexer -f indexer.tar.gz
 
