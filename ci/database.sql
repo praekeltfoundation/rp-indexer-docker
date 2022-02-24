@@ -36,3 +36,18 @@ CREATE TABLE public.contacts_contactgroup_contacts (
     contactgroup_id integer NOT NULL,
     contact_id integer NOT NULL
 );
+
+CREATE TABLE public.contacts_contactgroup (
+    id integer NOT NULL,
+    is_active boolean NOT NULL,
+    created_on timestamp with time zone NOT NULL,
+    modified_on timestamp with time zone NOT NULL,
+    uuid character varying(36) NOT NULL,
+    name character varying(64) NOT NULL,
+    group_type character varying(1) NOT NULL,
+    status character varying(1) NOT NULL,
+    query text,
+    created_by_id integer NOT NULL,
+    modified_by_id integer NOT NULL,
+    org_id integer NOT NULL
+);
