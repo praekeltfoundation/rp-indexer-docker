@@ -41,11 +41,11 @@ jobs:
       - name: Test image
         # First run there are errors while it creates the indexes, so we only check for errors on second run
         run: |
-          docker run --name indexer --env-file docker.envfile --link postgis --link redis --publish 8080:8080 --detach indexer
+          docker run --name indexer --env-file docker.envfile --link postgis --link elasticsearch --detach indexer
           timeout ${{env.GREP_TIMEOUT}} grep -m 1 'completed indexing' <(docker logs --follow indexer 2>&1)
           docker stop indexer
           docker rm indexer
-          docker run --name indexer --env-file docker.envfile --link postgis --link redis --publish 8080:8080 --detach indexer
+          docker run --name indexer --env-file docker.envfile --link postgis --link elasticsearch --detach indexer
           timeout ${{env.GREP_TIMEOUT}} grep -m 1 'completed indexing' <(docker logs --follow indexer 2>&1)
           grep -v 'error' <(docker logs indexer 2>&1)
       - name: debug outputs
