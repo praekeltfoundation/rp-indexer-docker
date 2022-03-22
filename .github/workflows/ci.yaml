@@ -15,7 +15,7 @@ jobs:
       PGPASSWORD: temba
     strategy:
       matrix:
-        INDEXER_VERSION: ["6.2.0", "6.4.0", "7.0.0"]
+        INDEXER_VERSION: ["6.2.0", "6.4.0", "7.0.0", "7.2.0"]
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -88,4 +88,4 @@ jobs:
           context: .
           build-args: |
             INDEXER_REPO=${{env.INDEXER_REPO}}
-            INDEXER_VERSION=${{matrix.INDEXER_VERSION}} 
+            INDEXER_VERSION=${{matrix.INDEXER_VERSION}}
