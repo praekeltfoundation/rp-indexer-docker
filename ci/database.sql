@@ -51,3 +51,25 @@ CREATE TABLE public.contacts_contactgroup (
     modified_by_id integer NOT NULL,
     org_id integer NOT NULL
 );
+
+CREATE TABLE public.flows_flow (
+    id integer NOT NULL,
+    is_active boolean NOT NULL,
+    created_on timestamp with time zone NOT NULL,
+    modified_on timestamp with time zone NOT NULL,
+    uuid character varying(36) NOT NULL,
+    name character varying(64) NOT NULL,
+    is_archived boolean NOT NULL,
+    flow_type character varying(1) NOT NULL,
+    metadata text,
+    expires_after_minutes integer NOT NULL,
+    ignore_triggers boolean NOT NULL,
+    saved_on timestamp with time zone NOT NULL,
+    base_language character varying(4),
+    version_number character varying(8) NOT NULL,
+    created_by_id integer NOT NULL,
+    modified_by_id integer NOT NULL,
+    org_id integer NOT NULL,
+    saved_by_id integer NOT NULL,
+    is_system boolean NOT NULL
+)
