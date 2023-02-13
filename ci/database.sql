@@ -72,7 +72,7 @@ CREATE TABLE public.flows_flow (
     org_id integer NOT NULL,
     saved_by_id integer NOT NULL,
     is_system boolean NOT NULL
-)
+);
 
 CREATE TABLE public.flows_flowrun (
     id integer NOT NULL,
@@ -92,4 +92,4 @@ CREATE TABLE public.flows_flowrun (
     path jsonb,
     current_node_uuid character varying(36) NULL,
     delete_from_results boolean NULL
-)
+);
