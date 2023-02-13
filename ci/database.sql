@@ -73,3 +73,23 @@ CREATE TABLE public.flows_flow (
     saved_by_id integer NOT NULL,
     is_system boolean NOT NULL
 )
+
+CREATE TABLE public.flows_flowrun (
+    id integer NOT NULL,
+    uuid character varying(36) NOT NULL,
+    org_id integer NOT NULL,
+    flow_id integer NOT NULL,
+    status character varying(1) NOT NULL,
+    contact_id integer NOT NULL,
+    session_id integer NOT NULL,
+    created_on timestamp with time zone NOT NULL,
+    modified_on timestamp with time zone NOT NULL,
+    exited_on timestamp with time zone NULL,
+    responded boolean NOT NULL,
+    start_id integer NOT NULL,
+    submitted_by_id integer NOT NULL,
+    results jsonb,
+    path jsonb,
+    current_node_uuid character varying(36) NULL,
+    delete_from_results boolean NULL
+)
